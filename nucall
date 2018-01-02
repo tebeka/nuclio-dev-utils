@@ -5,6 +5,7 @@ import requests
 
 from argparse import ArgumentParser
 import json
+import socket
 
 bodies = {
     'log',
@@ -40,7 +41,11 @@ params = {  # fields
     'f2': 'fv2',
 }
 
-resp = requests.post(url, headers=headers, params=params)
+try:
+    resp = requests.post(url, headers=headers, params=params)
+except (requests.exceptions.BaseHTTPError, socket.error) as err:
+    raise SystemExit('error: {}'.format(err))
+
 print('HTTP/{:.2f} {} {}'.format(
     resp.raw.version/10.0, resp.status_code, resp.reason))
 for header, value in sorted(resp.headers):
