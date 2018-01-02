@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+"""Hit Processor API"""
+
+import requests
+
+from argparse import ArgumentParser
+import json
+
+bodies = {
+    'log',
+    'log_with',
+    'panic',
+    'return_binary',
+    'return_bytes',
+    'return_dict',
+    'return_fields',
+    'return_list',
+    'return_path',
+    'return_response',
+    'return_status_and_dict',
+    'return_status_and_string',
+    'return_string',
+}
+
+parser = ArgumentParser(description='hit processor API')
+parser.add_argument('-p', '--port', help='port', type=int, default=8080)
+parser.add_argument('-H', '--host', help='host', default='localhost')
+parser.add_argument(
+    '-b', '--body', help='body', choices=bodies, default='return_path')
+
+args = parser.parse_args()
+
+url = 'http://{}:{}/api/event'.format(args.host, args.port)
+headers = {
+    'H1': 'V1',
+    'H2': 'V2',
+}
+params = {  # fields
+    'f1': 'fv1',
+    'f2': 'fv2',
+}
+
+resp = requests.post(url, headers=headers, params=params)
+print('HTTP/{:.2f} {} {}'.format(
+    resp.raw.version/10.0, resp.status_code, resp.reason))
+for header, value in sorted(resp.headers):
+    if header.lower() == 'x-nuclio-logs':
+        print('{}:'.format(header))
+        for log in json.loads(value):
+            print('\t{}'.format(log))
+    else:
+        print('{}: {}'.format(header, value))
+
+print()
+print(resp.text)
+
+if not resp.ok:
+    raise SystemExit(1)
