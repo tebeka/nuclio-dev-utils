@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+"""Generate event and dump to stdout"""
+
+from argparse import ArgumentParser
+from time import time
+import json
+import sys
+
+body = 'event body'
+
+event = {
+    # body, size are filled by main
+    'body': None,
+    'size': None,
+    'content-type': 'text/plain',
+    'trigger': {
+        'class': 'async',
+        'kind': 'rabbitmq',
+    },
+    'fields': {
+        'f1': 'fv1',
+        'f2': 2,
+    },
+    'headers': {
+        'H1': 'hv1',
+        'H2': 'hv2',
+    },
+    'id': 'event id',
+    'method': 'POST',
+    'path': '/api/event',
+    'timestamp': int(time()),
+    'url': 'http://nuclio.io',
+    'version': 23,
+}
+
+parser = ArgumentParser(description=__doc__)
+parser.add_argument('body', help='event body', nargs='?', default='event body')
+parser.add_argument(
+    '-H', '--header', help='set header (key=value), can repeat',
+    action='append', dest='headers', metavar='HEADER', default=[])
+parser.add_argument(
+    '-f', '--field', help='set field (key=value), can repeate',
+    action='append', dest='fields', metavar='FIELD', default=[])
+args = parser.parse_args()
+
+event['body'] = args.body
+event['size'] = len(args.body)
+
+for header in args.headers:
+    key, value = header.split('=', 1)
+    event['headers'][key] = value
+
+for field in args.fields:
+    key, value = field.split('=', 1)
+    event['fields'][key] = value
+
+json.dump(event, sys.stdout)
