@@ -2,6 +2,7 @@
 """Generate event and dump to stdout"""
 
 from argparse import ArgumentParser
+from base64 import b64encode
 from time import time
 import json
 import sys
@@ -43,7 +44,9 @@ parser.add_argument(
     action='append', dest='fields', metavar='FIELD', default=[])
 args = parser.parse_args()
 
-event['body'] = args.body
+body = b64encode(args.body.encode('utf-8'))
+
+event['body'] = body.decode('utf-8')
 event['size'] = len(args.body)
 
 for header in args.headers:
