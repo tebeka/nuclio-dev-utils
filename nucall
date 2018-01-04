@@ -14,6 +14,7 @@ bodies = {
     'return_binary',
     'return_bytes',
     'return_dict',
+    'return_error',
     'return_fields',
     'return_list',
     'return_path',
