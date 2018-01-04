@@ -13,9 +13,9 @@ parser.add_argument(
 args = parser.parse_args()
 
 # Assume we're running from nuclio root
-wrapper_jar = 'pkg/processor/runtime/java/target/nuclio-java-warpper.jar'
+wrapper_jar = 'pkg/processor/runtime/java/build/libs/nuclio-java-wrapper.jar'
 handler_jar = \
-    '{}/java-handler/target/nuclio-test-handler-1.0-SNAPSHOT.jar'.format(here)
+    '{}/java-handler/build/libs/java-handler.jar'.format(here)
 
 
 cmd = [
