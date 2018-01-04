@@ -35,6 +35,7 @@ url = 'http://{}:{}/api/event'.format(args.host, args.port)
 headers = {
     'H1': 'V1',
     'H2': 'V2',
+    'X-Nuclio-Log-Level': 'debug',
 }
 params = {  # fields
     'f1': 'fv1',
@@ -42,13 +43,14 @@ params = {  # fields
 }
 
 try:
-    resp = requests.post(url, headers=headers, params=params)
+    resp = requests.post(url, headers=headers, params=params, data=args.body)
 except (requests.exceptions.BaseHTTPError, socket.error) as err:
     raise SystemExit('error: {}'.format(err))
 
-print('HTTP/{:.2f} {} {}'.format(
+print('HTTP/{:.1f} {} {}'.format(
     resp.raw.version/10.0, resp.status_code, resp.reason))
-for header, value in sorted(resp.headers):
+
+for header, value in sorted(resp.headers.items()):
     if header.lower() == 'x-nuclio-logs':
         print('{}:'.format(header))
         for log in json.loads(value):
