@@ -22,6 +22,7 @@ args = parser.parse_args()
 
 jar_file = abspath(args.jar.name)
 handler_name = args.handler
+max_workers = args.max_workers
 
 cfg = '''
 meta:
@@ -33,7 +34,7 @@ spec:
     incrementor_http:
       maxWorkers: {}
       kind: http
-'''.format(basename(jar_file), handler_name. args.max_workers)
+'''.format(basename(jar_file), handler_name, max_workers)
 
 cfg_file = '/tmp/java-handler.yaml'
 with open(cfg_file, 'w') as out:
