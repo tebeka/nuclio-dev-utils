@@ -16,6 +16,8 @@ parser.add_argument(
     '-j', '--jar', help='jar file name', type=FileType(), default=default_jar)
 parser.add_argument(
     '-H', '--handler', help='handler name', default=default_handler)
+parser.add_argument(
+    '-w', '--max-workers', help='number of workers', default=1, type=int)
 args = parser.parse_args()
 
 jar_file = abspath(args.jar.name)
@@ -29,9 +31,9 @@ spec:
   handler: {}:{}
   triggers:
     incrementor_http:
-      maxWorkers: 1
+      maxWorkers: {}
       kind: http
-'''.format(basename(jar_file), handler_name)
+'''.format(basename(jar_file), handler_name. args.max_workers)
 
 cfg_file = '/tmp/java-handler.yaml'
 with open(cfg_file, 'w') as out:
