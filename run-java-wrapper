@@ -3,25 +3,30 @@
 
 from os.path import dirname, abspath
 from subprocess import call
-from argparse import ArgumentParser
+from argparse import ArgumentParser, FileType
 
 here = dirname(abspath(__file__))
+
+# Assume we're running from nuclio root
+wrapper_jar = 'pkg/processor/runtime/java/build/libs/nuclio-java-wrapper.jar'
+default_jar = \
+    '{}/java-handler/build/libs/java-handler.jar'.format(here)
+default_handler = 'ReverseEventHandler'
 
 parser = ArgumentParser(description=__doc__)
 parser.add_argument(
     '-p', '--port', type=int, help='server port', default=8080)
+parser.add_argument(
+    '-j', '--jar', help='jar file name', type=FileType(), default=default_jar)
+parser.add_argument(
+    '-H', '--handler', help='handler name', default=default_handler)
 args = parser.parse_args()
-
-# Assume we're running from nuclio root
-wrapper_jar = 'pkg/processor/runtime/java/build/libs/nuclio-java-wrapper.jar'
-handler_jar = \
-    '{}/java-handler/build/libs/java-handler.jar'.format(here)
 
 
 cmd = [
     'java', '-jar', wrapper_jar,
-    '-jar', handler_jar,
-    '-handler', 'ReverseEventHandler',
+    '-jar', abspath(args.jar.name),
+    '-handler', args.handler,
     '-port', str(args.port),
     '-verbose',
 ]
