@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+# Run the java processor
+
+from os.path import dirname, abspath, basename
+from os import environ
+from subprocess import call
+from argparse import ArgumentParser, FileType
+
+here = dirname(abspath(__file__))
+
+default_file = '{}./nodejs-handler/handler.js'.format(here)
+default_handler = 'testHandler'
+
+parser = ArgumentParser(description=__doc__)
+parser.add_argument(
+    '-f', '--file', help='handler file name', type=FileType(),
+    default=default_file)
+parser.add_argument(
+    '-H', '--handler', help='handler name', default=default_handler)
+parser.add_argument(
+    '-w', '--max-workers', help='number of workers', default=1, type=int)
+args = parser.parse_args()
+
+js_file = abspath(args.file.name)
+handler_name = args.handler
+max_workers = args.max_workers
+
+cfg = '''
+meta:
+  name: java-reverser
+spec:
+  runtime: nodejs
+  handler: {}:{}
+  triggers:
+    incrementor_http:
+      maxWorkers: {}
+      kind: http
+'''.format(basename(js_file), handler_name, max_workers)
+
+cfg_file = '/tmp/nodejs-handler.yaml'
+with open(cfg_file, 'w') as out:
+    out.write(cfg)
+
+env = environ.copy()
+# Assume we're running from nuclio root
+env['NUCLIO_NODEJS_WRAPPER_PATH'] = 'pkg/processor/runtime/nodejs/wrapper.js'
+env['NUCLIO_HANDLER_DIR'] = dirname(js_file)
+
+retval = call(['./processor', '-config', cfg_file], env=env)
+exit(retval)
