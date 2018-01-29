@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+"""Clean test docker images"""
+
+from argparse import ArgumentParser
+from subprocess import Popen, PIPE, check_output
+
+prefixes = [
+    'nuclio/deploy-test-',
+    'nuclio/processor-json-parser-with-function-config-',
+    'nuclio/processor-json-parser-with-inline-function-config-',
+    'nuclio/processor-outputter-',
+    'nuclio/processor-reverser-',
+]
+
+# Support --help
+parser = ArgumentParser(description=__doc__)
+parser.parse_args()
+
+cmd = ['docker', 'images', '--format', '{{.Repository}}']
+for name in Popen(cmd, stdout=PIPE, encoding='utf-8').stdout:
+    name = name.strip()
+    if any(name.startswith(prefix) for prefix in prefixes):
+        print(name)
+        check_output(['docker', 'rmi', name])
