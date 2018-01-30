@@ -21,4 +21,4 @@ for name in Popen(cmd, stdout=PIPE, encoding='utf-8').stdout:
     name = name.strip()
     if any(name.startswith(prefix) for prefix in prefixes):
         print(name)
-        check_output(['docker', 'rmi', name])
+        check_output(['docker', 'rmi', '-f', name])
