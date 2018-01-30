@@ -2,7 +2,7 @@ meta:
   name: java-reverser
 spec:
   runtime: java
-  handler: nuclio-test-handler-1.0-SNAPSHOT.jar:ReverseEventHandler
+  handler: nuclio-test-handler.jar:ReverseEventHandler
   triggers:
     incrementor_http:
       maxWorkers: 1
