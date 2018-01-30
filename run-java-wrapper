@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # Run the java wrapper jar
 
+from os import environ
 from os.path import dirname, abspath
 from subprocess import call
 from argparse import ArgumentParser, FileType
@@ -24,7 +25,9 @@ args = parser.parse_args()
 
 
 cmd = [
-    'java', '-jar', wrapper_jar,
+    'java',
+    '-cp', abspath(args.jar.name),
+    '-jar', wrapper_jar,
     '-jar', abspath(args.jar.name),
     '-handler', args.handler,
     '-port', str(args.port),
