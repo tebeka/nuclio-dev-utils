@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 # Run the java wrapper jar
 
-from os import environ
-from os.path import dirname, abspath
-from subprocess import call
 from argparse import ArgumentParser, FileType
+from os.path import abspath, dirname
+from subprocess import call
+
+from java_build import build_wrapper
 
 here = dirname(abspath(__file__))
 
-# Assume we're running from nuclio root
-wrapper_jar = 'pkg/processor/runtime/java/build/libs/nuclio-java-wrapper.jar'
-default_jar = \
-    '{}/java-handler/build/libs/java-handler.jar'.format(here)
+default_jar = f'{here}/java-handler/build/libs/nuclio-test-handler.jar'
 default_handler = 'ReverseEventHandler'
 
 parser = ArgumentParser(description=__doc__)
@@ -23,15 +21,16 @@ parser.add_argument(
     '-H', '--handler', help='handler name', default=default_handler)
 args = parser.parse_args()
 
+jar_name = build_wrapper(args.jar.name)
+if not jar_name:
+    raise SystemExit('error: cannot build')
 
 cmd = [
     'java',
-    '-cp', abspath(args.jar.name),
-    '-jar', wrapper_jar,
-    '-jar', abspath(args.jar.name),
+    '-jar', jar_name,
     '-handler', args.handler,
     '-port', str(args.port),
     '-verbose',
 ]
 
-exit(call(cmd))
+raise SystemExit(call(cmd))

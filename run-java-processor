@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # Run the java processor
 
-from os.path import dirname, abspath, basename
-from os import environ
-from subprocess import call
 from argparse import ArgumentParser, FileType
+from os import environ
+from os.path import abspath, dirname
+from subprocess import call
+
+from java_build import build_wrapper
 
 here = dirname(abspath(__file__))
 
-default_jar = '{}./java-handler/build/libs/java-handler.jar'.format(here)
+default_jar = f'{here}/java-handler/build/libs/nuclio-test-handler.jar'
 default_handler = 'ReverseEventHandler'
 
 parser = ArgumentParser(description=__doc__)
@@ -20,21 +22,24 @@ parser.add_argument(
     '-w', '--max-workers', help='number of workers', default=1, type=int)
 args = parser.parse_args()
 
-jar_file = abspath(args.jar.name)
+wrapper_jar = build_wrapper(abspath(args.jar.name))
+if not wrapper_jar:
+    raise SystemExit('error: cannot build')
+
 handler_name = args.handler
 max_workers = args.max_workers
 
-cfg = '''
+cfg = f'''
 meta:
   name: java-reverser
 spec:
   runtime: java
-  handler: {}:{}
+  handler: {handler_name}
   triggers:
     incrementor_http:
-      maxWorkers: {}
+      maxWorkers: {args.max_workers}
       kind: http
-'''.format(basename(jar_file), handler_name, max_workers)
+'''
 
 cfg_file = '/tmp/java-handler.yaml'
 with open(cfg_file, 'w') as out:
@@ -42,9 +47,7 @@ with open(cfg_file, 'w') as out:
 
 env = environ.copy()
 # Assume we're running from nuclio root
-env['NUCLIO_WRAPPER_JAR'] = \
-    'pkg/processor/runtime/java/build/libs/nuclio-java-wrapper.jar'
-env['NUCLIO_HANDLER_DIR'] = dirname(jar_file)
+env['NUCLIO_WRAPPER_JAR'] = wrapper_jar
 
 retval = call(['./processor', '-config', cfg_file], env=env)
-exit(retval)
+raise SystemExit(retval)
