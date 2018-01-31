@@ -1,0 +1,15 @@
+#!/bin/bash
+# Run tests, save output to log file and also time it
+
+case $1 in
+    -h | --help ) echo "usage: $(basename $0) [TEST_NAME]"; exit;;
+esac
+
+log_file=/tmp/nuclio-test-$(date +%Y%M%dT%H%M%S)-$(hostname).log
+echo "log file at ${log_file}"
+
+set -o pipefail
+
+time 2>&1 make test | tee ${log_file}
+
+echo "log file at ${log_file}"
