@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+"""Update the Nuclio Java SDK jar in all project"""
+
+from glob import iglob
+from shutil import copy
+from argparse import ArgumentParser, FileType
+from os.path import basename, abspath
+
+
+parser = ArgumentParser(description=__doc__)
+parser.add_argument('sdk_jar', help='path to SDK jar', type=FileType())
+
+args = parser.parse_args()
+jar_path = abspath(args.sdk_jar.name)
+matches = iglob(f'./**/{basename(jar_path)}', recursive=True)
+nfiles = 0
+for nfiles, local_jar in enumerate(matches, 1):
+    print(local_jar)
+    copy(jar_path, local_jar)
+
+print(f'Total of {nfiles} updated')
