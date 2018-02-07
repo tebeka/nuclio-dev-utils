@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 """Run the python processor"""
 
+import atexit
 from argparse import ArgumentParser, FileType
-from os import environ
-from os.path import abspath, dirname, basename, splitext
+from os import environ, remove
+from os.path import abspath, basename, dirname, exists, splitext
+from shutil import rmtree
 from subprocess import call
 
 here = dirname(abspath(__file__))
@@ -47,6 +49,20 @@ wrapper_script = abspath('./pkg/processor/runtime/python/wrapper.py')
 env = environ.copy()
 env['NUCLIO_PYTHON_PATH'] = py_path
 env['NUCLIO_PYTHON_WRAPPER_PATH'] = wrapper_script
+
+
+def cleanup():
+    pyc = args.file.name + 'c'
+    if exists(pyc):
+        remove(pyc)
+
+    pycache = f'{py_path}/__pycache__'
+    if exists(pycache):
+        rmtree(pycache)
+
+
+cleanup()  # Clean slate
+atexit.register(cleanup)
 
 retval = call(['./processor', '-config', cfg_file], env=env)
 raise SystemExit(retval)

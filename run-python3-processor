@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 """Run the python3 processor"""
 
+import atexit
 from argparse import ArgumentParser, FileType
 from os import environ
-from os.path import abspath, dirname, basename, splitext
+from os.path import abspath, basename, dirname, exists, splitext
+from shutil import rmtree
 from subprocess import call
 
 here = dirname(abspath(__file__))
@@ -43,6 +45,16 @@ with open(cfg_file, 'w') as out:
 
 env = environ.copy()
 env['NUCLIO_PYTHON_PATH'] = py_path
+
+
+def cleanup():
+    pycache = f'{py_path}/__pycache__'
+    if exists(pycache):
+        rmtree(pycache)
+
+
+cleanup()  # Clean slate
+atexit.register(cleanup)
 
 # Assume we're running from nuclio root
 retval = call(['./processor', '-config', cfg_file], env=env)

@@ -2,7 +2,7 @@
 """Clean test docker images"""
 
 from argparse import ArgumentParser
-from subprocess import Popen, PIPE, check_output
+from subprocess import PIPE, Popen, check_output
 
 prefixes = [
     'nuclio/deploy-test-',

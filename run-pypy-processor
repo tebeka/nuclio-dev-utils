@@ -57,11 +57,12 @@ symlink(iface_path, dest_iface)
 
 
 def cleanup():
-    for file in [dest_iface, dest_iface + 'c']:
+    for file in [dest_iface, dest_iface + 'c', args.file.name + 'c']:
         if exists(file):
             remove(file)
 
 
+cleanup()  # Clean slate
 atexit.register(cleanup)
 
 env = environ.copy()

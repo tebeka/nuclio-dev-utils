@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """Hit Processor API"""
 
-import requests
-
-from argparse import ArgumentParser
 import json
 import socket
+from argparse import ArgumentParser
+
+import requests
 
 bodies = {
     'log',
