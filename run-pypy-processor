@@ -4,7 +4,6 @@
 
 import atexit
 from argparse import ArgumentParser, FileType
-from functools import partial
 from os import environ, remove, symlink
 from os.path import abspath, basename, dirname, exists, splitext
 from subprocess import call, check_output
@@ -55,13 +54,22 @@ dest_iface = f'{py_path}/{basename(iface_path)}'
 if exists(dest_iface):
     remove(dest_iface)
 symlink(iface_path, dest_iface)
-atexit.register(partial(remove, dest_iface))
+
+
+def cleanup():
+    for file in [dest_iface, dest_iface + 'c']:
+        if exists(file):
+            remove(file)
+
+
+atexit.register(cleanup)
 
 env = environ.copy()
 env['NUCLIO_PYTHON_PATH'] = py_path
 env['NUCLIO_PYPY_HOME'] = pypy_home
 env['LD_LIBRARY_PATH'] = f'{pypy_home}/bin'
 env['GODEBUG'] = 'cgocheck=0'
+
 
 retval = call(['./processor', '-config', cfg_file], env=env)
 raise SystemExit(retval)

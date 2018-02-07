@@ -1,1 +1,0 @@
-/home/miki/work/iguazio/src/github.com/nuclio/nuclio/pkg/processor/runtime/pypy/nuclio_interface.py
