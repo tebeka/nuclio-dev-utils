@@ -37,7 +37,7 @@ spec:
   handler: {handler_name}
   triggers:
     incrementor_http:
-      maxWorkers: {args.max_workers}
+      maxWorkers: {max_workers}
       kind: http
 '''
 
