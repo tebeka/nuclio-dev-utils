@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+"""Run a processor benchmark"""
+
+import atexit
+import shlex
+from argparse import ArgumentParser
+from subprocess import Popen, call
+from time import sleep, time
+from urllib.request import URLError, urlopen
+
+handler_url = 'http://localhost:8080'
+
+
+def count_type(value):
+    value = int(value)
+    if value <= 0:
+        raise ValueError
+    return value
+
+
+parser = ArgumentParser(description=__doc__)
+parser.add_argument(
+    'command',
+    help='command (e.g. "run -j handler.jar -H Handler -w {}")')
+parser.add_argument(
+    '-w', '--workers', help='number of workers', type=count_type, default=1)
+
+args = parser.parse_args()
+
+num_workers = str(args.workers)
+
+try:
+    cmd = args.command.format(num_workers)
+except IndexError as err:
+    raise SystemExit(f'error: {err}')
+
+out = open('/dev/null')
+pipe = Popen(shlex.split(cmd), stdout=out)
+atexit.register(pipe.kill)
+
+timeout = 30
+start = time()
+while time() - start < (timeout * 60):
+    try:
+        urlopen(handler_url)
+        break
+    except URLError:
+        sleep(0.1)
+else:
+    raise SystemError(f'error: handler not up after {timeout}sec')
+
+call(['wrk', '-c', num_workers, '-t', num_workers, '-d10', handler_url])
