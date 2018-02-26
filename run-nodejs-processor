@@ -26,7 +26,7 @@ handler_name = args.handler
 max_workers = args.max_workers
 
 cfg = '''
-meta:
+metadata:
   name: java-reverser
 spec:
   runtime: nodejs

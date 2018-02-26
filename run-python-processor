@@ -28,7 +28,7 @@ handler_name = args.handler
 max_workers = args.max_workers
 
 cfg = f'''
-meta:
+metadata:
   name: python handler
 spec:
   runtime: python

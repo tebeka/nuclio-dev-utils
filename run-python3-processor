@@ -28,15 +28,16 @@ handler_name = args.handler
 max_workers = args.max_workers
 
 cfg = f'''
-meta:
+metadata:
   name: python3 handler
 spec:
   runtime: python3
   handler: {module_name}:{handler_name}
   triggers:
-    incrementor_http:
+    t1:
       maxWorkers: {max_workers}
       kind: http
+      port: 8080
 '''
 
 cfg_file = '/tmp/python3-handler.yaml'
