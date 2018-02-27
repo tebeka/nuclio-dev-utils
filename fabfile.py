@@ -1,11 +1,25 @@
-from fabric.api import sudo, env, run, task, execute, settings
-from fabric.context_managers import shell_env
+"""Running remote jobs on a CI machine
+
+You'll need fabric3 installed.
+To install a machine run
+    fab install
+
+To run tests run
+    fab test
+"""
+from os import environ
 from os.path import expanduser
+
+from fabric.api import env, execute, run, settings, sudo, task
+from fabric.context_managers import shell_env
+
+ci_host = environ.get('NUCLIO_CI_HOST', '54.172.36.252')
+key_file = environ.get('NUCLIO_CI_KEY', expanduser('~/.ssh/nuclio-ci.pem'))
 
 user = 'ubuntu'
 env['user'] = user
-env['host_string'] = '54.172.36.252'
-env['key_filename'] = expanduser('~/.ssh/nuclio-ci.pem')
+env['host_string'] = ci_host
+env['key_filename'] = key_file
 src_dir = '~/go/src/github.com/nuclio/nuclio'
 
 
