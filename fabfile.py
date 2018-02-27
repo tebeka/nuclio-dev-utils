@@ -73,4 +73,5 @@ def run_tests(branch):
     with settings(cwd=src_dir), shell_env(GOPATH=f'/home/{user}/go'):
         run(f'git checkout {branch}')
         run('git pull')
-        run('make lint test')
+        run('make test')
+        #run('make lint test')
