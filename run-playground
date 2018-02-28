@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+ldflags="-X github.com/nuclio/nuclio/pkg/version.label=latest"
+ldflags="${ldflags} -X github.com/nuclio/nuclio/pkg/version.os=$(go env GOOS)"
+ldflags="${ldflags} -X github.com/nuclio/nuclio/pkg/version.arch=$(go env GOARCH)"
+
+go build \
+    -ldflags="${ldflags}" \
+    ./cmd/playground
+
+src_dir=$(mktemp -d)
+echo "source directory: ${src_dir}"
+
+./playground \
+    --platform local \
+    --no-pull \
+    -sources-dir ${src_dir} \
+    --assets-dir ./cmd/playground/static 
