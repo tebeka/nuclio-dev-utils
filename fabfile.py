@@ -13,7 +13,7 @@ from os.path import expanduser
 from fabric.api import env, execute, run, settings, sudo, task
 from fabric.context_managers import shell_env
 
-ci_host = environ.get('NUCLIO_CI_HOST', '54.172.36.252')
+ci_host = environ.get('NUCLIO_CI_HOST', '35.153.142.27')
 key_file = environ.get('NUCLIO_CI_KEY', expanduser('~/.ssh/nuclio-ci.pem'))
 
 user = 'ubuntu'
@@ -87,5 +87,5 @@ def run_tests(branch):
     with settings(cwd=src_dir), shell_env(GOPATH=f'/home/{user}/go'):
         run(f'git checkout {branch}')
         run('git pull')
-        run('make test')
-        #run('make lint test')
+        run('2>&1 make test | tee ~/nuclio-test-$(date +%Y%m%dT%H%M%S).log')
+        # run('make lint test')
