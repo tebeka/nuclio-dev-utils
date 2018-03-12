@@ -47,7 +47,7 @@ spec:
           - 1
 '''
 
-cfg_file = '/tmp/python3-handler.yaml'
+cfg_file = '/tmp/kafka-handler.yaml'
 with open(cfg_file, 'w') as out:
     out.write(cfg)
 
