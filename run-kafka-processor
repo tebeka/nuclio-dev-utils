@@ -37,13 +37,14 @@ spec:
     http:
       maxWorkers: {max_workers}
       kind: http
-    kafka:
+    franz:
       kind: "kafka"
       url: "127.0.0.1:9092"
       attributes:
-        topic: "topic1"
+        topic: trial
         partitions:
           - 0
+          - 1
 '''
 
 cfg_file = '/tmp/python3-handler.yaml'
