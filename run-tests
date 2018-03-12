@@ -10,6 +10,7 @@ echo "log file at ${log_file}"
 
 set -o pipefail
 
-time 2>&1 make test | tee ${log_file}
+export NUCLIO_TEST_HOST=172.17.0.1
+time 2>&1 make test-undockerized | tee ${log_file}
 
 echo "log file at ${log_file}"
