@@ -30,6 +30,7 @@ def create_topic(name):
         '--replication-factor', '1',
     ]
     print(' '.join(cmd))
+    rv = run(cmd)
     return rv.returncode == 0
 
 
