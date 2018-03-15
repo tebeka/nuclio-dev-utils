@@ -3,14 +3,34 @@
 
 from argparse import ArgumentParser
 from itertools import count
+from os import remove
 from os.path import expanduser, isfile
 from random import random
-from subprocess import run, PIPE
+from subprocess import PIPE, run
 from time import sleep
 
 from pykafka import KafkaClient
 
 id_file = expanduser('~/.nuclio-kafka-id')
+
+
+def get_container_id():
+    with open(id_file) as fp:
+        return fp.read().strip()
+
+
+def create_topic(name):
+    container_id = get_container_id()
+    cmd = [
+        'docker', 'exec', container_id,
+        '/opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh',
+        '--create', '--topic', name,
+        '--zookeeper', 'localhost:2181',
+        '--partitions', '7',
+        '--replication-factor', '1',
+    ]
+    print(' '.join(cmd))
+    return rv.returncode == 0
 
 
 parser = ArgumentParser(description=__doc__)
@@ -29,8 +49,7 @@ args = parser.parse_args()
 
 if args.run_docker:
     if isfile(id_file):
-        with open(id_file) as fp:
-            kafka_cid = fp.read().strip()
+        kafka_cid = get_container_id()
         out = run(['docker', 'ps', '-q'], stdout=PIPE).stdout.decode('utf-8')
         for line in out.splitlines():
             cid = line.strip()
@@ -49,32 +68,28 @@ if args.run_docker:
     print(' '.join(cmd))
     with open(id_file, 'w') as out:
         rv = run(cmd, stdout=out)
-    raise SystemExit(rv.returncode)
+    if rv.returncode != 0:
+        raise SystemExit(rv.returncode)
+
+    rv = 0 if create_topic(args.topic) else 1
+    raise SystemExit(rv)
 
 try:
-    with open(id_file) as fp:
-        container_id = fp.read().strip()
+    container_id = get_container_id()
 except IOError:
     raise SystemExit('error: container not running')
 
 if args.stop_docker:
-    cmd = ['docker', 'rm', '-rf', container_id]
+    cmd = ['docker', 'rm', '-f', container_id]
     print(' '.join(cmd))
     rv = run(cmd)
+    if rv.returncode == 0:
+        remove(id_file)
     raise SystemExit(rv.returncode)
 
 if args.create_topic:
-    cmd = [
-        'docker', 'exec', container_id,
-        '/opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh',
-        '--create', '--topic', args.topic,
-        '--zookeeper', 'localhost:2181',
-        '--partitions', '7',
-        '--replication-factor', '1',
-    ]
-    print(' '.join(cmd))
-    rv = run(cmd)
-    raise SystemExit(rv.returncode)
+    rv = 0 if create_topic(args.topic) else 1
+    raise SystemExit(rv)
 
 
 log = print if args.verbose else lambda x: 1
