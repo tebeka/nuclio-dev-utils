@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from itertools import count
 from os.path import expanduser, isfile
 from random import random
-from subprocess import run
+from subprocess import run, PIPE
 from time import sleep
 
 from pykafka import KafkaClient
@@ -29,7 +29,14 @@ args = parser.parse_args()
 
 if args.run_docker:
     if isfile(id_file):
-        raise SystemExit('error: kafka docker running')
+        with open(id_file) as fp:
+            kafka_cid = fp.read().strip()
+        out = run(['docker', 'ps', '-q'], stdout=PIPE).stdout.decode('utf-8')
+        for line in out.splitlines():
+            cid = line.strip()
+            if kafka_cid.startswith(cid):  # Short/long ID
+                raise SystemExit('error: kafka docker running')
+        print('warning: ignoring stale id file')
 
     cmd = [
         'docker', 'run', '-d',
