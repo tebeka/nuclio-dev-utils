@@ -43,8 +43,8 @@ spec:
       attributes:
         topic: trial
         partitions:
-          - 0
-          - 1
+          - id: 0
+          - id: 1
 '''
 
 cfg_file = '/tmp/kafka-handler.yaml'
