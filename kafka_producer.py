@@ -71,6 +71,7 @@ if args.run_docker:
         rv = run(cmd, stdout=out)
     if rv.returncode != 0:
         raise SystemExit(rv.returncode)
+    sleep(10)
 
     rv = 0 if create_topic(args.topic) else 1
     raise SystemExit(rv)
