@@ -13,7 +13,7 @@ from os import environ
 from fabric.api import env, execute, run, settings, sudo, task
 from fabric.context_managers import shell_env
 
-ci_host = environ.get('NUCLIO_CI_HOST', '35.196.144.192')
+ci_host = environ.get('NUCLIO_CI_HOST', '35.204.211.55')
 # key_file = environ.get('NUCLIO_CI_KEY', expanduser('~/.ssh/nuclio-ci.pem'))
 
 # user = 'ubuntu'
@@ -41,12 +41,13 @@ def install_docker():
     run('rm key')
     version = str(run('lsb_release -cs'))
     url = 'https://download.docker.com/linux/ubuntu'
-    repo = f'deb [arch=amd64] {url} {version} stable'
+    repo = f'deb [arch=amd64] {url} {version} edge'
     sudo(f'sudo add-apt-repository "{repo}"')
     sudo('apt-get update')
     sudo('apt-get install -y docker-ce')
     sudo('groupadd docker', warn_only=True)
     sudo(f'usermod -aG docker {user}')
+
 
 @task
 def install_docker_gce():
@@ -78,7 +79,8 @@ def install_go():
     run('tar xzf go1.10.linux-amd64.tar.gz')
     run('rm go1.10.linux-amd64.tar.gz')
     sudo('mv go /opt')
-    run('echo \'PATH=/opt/go/bin:$PATH\' >> ~/.bashrc')
+    run('echo \'export PATH=/opt/go/bin:$PATH\' >> ~/.bashrc')
+    run('echo \'export GOPATH=${HOME}/go\' >> ~/.bashrc')
 
 
 @task
@@ -107,7 +109,7 @@ def install():
 @task
 def make_images():
     with settings(cwd=src_dir), shell_env(GOPATH=f'/home/{user}/go'):
-        run('make docker-images')
+        run('make build')
 
 
 @task
