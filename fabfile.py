@@ -97,6 +97,7 @@ def clone_nuclio():
     ]
     for pkg in packages:
         run(f'/opt/go/bin/go get {pkg}')
+    run('mkdir -p ~/go/bin')
 
 
 @task
