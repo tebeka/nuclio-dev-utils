@@ -1,0 +1,5 @@
+#!/bin/bash
+
+/opt/fortinet/forticlientsslvpn/forticlientsslvpn_cli \
+    --server 199.203.119.33:10443 \
+    --vpnuser tebeka
