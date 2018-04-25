@@ -23,12 +23,12 @@ for runtime in glob('pkg/processor/runtime/*'):
     tee = Popen(['tee', out_file], stdin=PIPE)
     out = run(['go', 'test', '-v', f'./{test_dir}/...'], stdout=tee.stdin)
     if out.returncode != 0:
-        failed.append(name)
+        failed.append((name, out_file))
 
 print('')
 if failed:
     print('FAILED runtimes:')
-    for name in sorted(failed):
-        print(f'\t{name}')
+    for name, out_file in sorted(failed):
+        print(f'\t{name} ({out_file})')
 else:
     print('PASSed all runtimes')
