@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+"""Run only runtime tests"""
+
+from argparse import ArgumentParser
+from glob import glob
+from os.path import basename, isdir
+from subprocess import PIPE, Popen, run
+
+# Support --help
+parser = ArgumentParser(description=__doc__)
+parser.parse_args()
+
+failed = []
+
+for runtime in glob('pkg/processor/runtime/*'):
+    test_dir = f'{runtime}/test'
+    if not isdir(test_dir):
+        continue
+
+    name = basename(runtime)
+    print(f'>>> {name} <<<'.center(80))
+    out_file = f'/tmp/test-{name}.log'
+    tee = Popen(['tee', out_file], stdin=PIPE)
+    out = run(['go', 'test', '-v', f'./{test_dir}/...'], stdout=tee.stdin)
+    if out.returncode != 0:
+        failed.append(name)
+
+print('')
+if failed:
+    print('FAILED runtimes:')
+    for name in sorted(failed):
+        print(f'\t{name}')
+else:
+    print('PASSed all runtimes')

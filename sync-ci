@@ -1,0 +1,18 @@
+#!/bin/bash
+
+case $1 in
+    -h | --help )
+	echo "usage: $(basename $0)"; exit;;
+esac
+
+if [ $# -ne 0 ]; then
+    echo "error: wrong number of arguments"
+    exit 1
+fi
+
+rsync \
+    -z \
+    -e ssh \
+    --exclude .git \
+    -av .. nucio-ci:nuclio/src/gitnub.com/nuclio
+

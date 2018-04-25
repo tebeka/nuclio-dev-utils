@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+
+from base64 import b64encode
+import yaml
+from sys import stdout
+
+src = b'''
+import io.nuclio.Context;
+import io.nuclio.Event;
+import io.nuclio.EventHandler;
+import io.nuclio.Response;
+
+
+public class ReverseEventHandler implements EventHandler {
+    @Override
+    public Response handleEvent(Context context, Event event) {
+       String body = new String(event.getBody());
+
+       context.getLogger().infoWith("Got event", "body", body);
+       String reversed = new StringBuilder(body).reverse().toString();
+
+       return new Response().setBody(reversed.getBytes());
+    }
+}
+'''
+
+cfg = {
+    'meta': {
+        'name': 'java-reverser',
+    },
+    'spec': {
+        'runtime': 'java',
+        'handler': 'ReverseEventHandler',
+        'triggers': {
+            'http': {
+                'kind': 'http',
+                'maxWorkers': 1,
+            },
+        },
+        'build': {
+            'functionSourceCode': b64encode(src).decode(),
+        },
+    },
+}
+
+yaml.dump(cfg, stdout, default_flow_style=False)
