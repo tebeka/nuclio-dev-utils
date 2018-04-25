@@ -18,14 +18,11 @@ parser.add_argument(
     '-f', '--file', help='handler file', type=FileType(), default=default_file)
 parser.add_argument(
     '-H', '--handler', help='handler name', default=default_handler)
-parser.add_argument(
-    '-w', '--max-workers', help='number of workers', default=1, type=int)
 args = parser.parse_args()
 
 py_path = dirname(args.file.name)
 module_name, _ = splitext(basename(args.file.name))
 handler_name = args.handler
-max_workers = args.max_workers
 
 cfg = f'''
 metadata:
@@ -34,17 +31,14 @@ spec:
   runtime: python
   handler: {module_name}:{handler_name}
   triggers:
-    http:
-      maxWorkers: {max_workers}
-      kind: http
     franz:
       kind: "kafka"
       url: "127.0.0.1:9092"
       attributes:
         topic: trial
-        partitions:
-          - id: 0
-          - id: 1
+      partitions:
+        - id: "0"
+        - id: "1"
 '''
 
 cfg_file = '/tmp/kafka-handler.yaml'
