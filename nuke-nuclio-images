@@ -1,0 +1,21 @@
+#!/bin/bash
+# Nuke all nuclio docker images
+
+case $1 in
+    -h | --help ) echo "usage: $(basename $0)"; exit;;
+esac
+
+if [ $# -ne 0 ]; then
+    1>&2 echo "error: wrong number of arguments"
+    exit 1
+fi
+
+running=$(docker ps -qa)
+
+if [ -n "${running}" ]; then
+    docker rm -f ${running}
+fi
+
+docker images | \
+    awk '$1 ~ /nuclio/ {print $1 ":" $2}' | \
+    xargs -i docker rmi {}
