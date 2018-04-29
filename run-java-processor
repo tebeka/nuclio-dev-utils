@@ -35,6 +35,9 @@ metadata:
 spec:
   runtime: java
   handler: {handler_name}
+  runtimeAttributes:
+    jvmOptions:
+      - -Xmx512m
   triggers:
     incrementor_http:
       maxWorkers: {max_workers}
