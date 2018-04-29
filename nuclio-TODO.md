@@ -13,6 +13,7 @@ nuclio out-of-band todo list
 - Upgrade Go to 1.10 (dockers)
 - Other encoding (msgpack, flatbuffers, ...)
 - RPC should first connect, then load to allow initial logging (see [here][580])
+- Upgrade gradle to 4.7
 
 
 [flask]: https://andrewgriffithsonline.com/blog/180412-deploy-flask-api-any-serverless-cloud-platform/
