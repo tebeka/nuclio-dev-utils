@@ -15,6 +15,8 @@ nuclio out-of-band todo list
 - Other encoding (msgpack, flatbuffers, ...)
 - RPC should first connect, then load to allow initial logging (see [here][580])
 - Upgrade gradle to 4.7
+- Faster RPC (msgpack? flatbuffers?)
+- RPC via shared memory
 
 
 [580]: https://github.com/nuclio/nuclio/issues/580
