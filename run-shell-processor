@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+# Run the shell processor
+
+from argparse import ArgumentParser
+from os.path import abspath, dirname
+from subprocess import call
+
+here = dirname(abspath(__file__))
+
+parser = ArgumentParser(description=__doc__)
+parser.add_argument(
+    '-w', '--max-workers', help='number of workers', default=1, type=int)
+args = parser.parse_args()
+
+max_workers = args.max_workers
+
+cfg = f'''
+metadata:
+  name: shell
+spec:
+  runtime: shell
+  handler: true:main
+  triggers:
+    incrementor_http:
+      maxWorkers: {max_workers}
+      kind: http
+'''
+
+cfg_file = '/tmp/shell-handler.yaml'
+with open(cfg_file, 'w') as out:
+    out.write(cfg)
+
+retval = call(['./processor', '-config', cfg_file])
+raise SystemExit(retval)

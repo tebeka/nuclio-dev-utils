@@ -17,6 +17,7 @@ nuclio out-of-band todo list
 - Upgrade gradle to 4.7
 - Faster RPC (msgpack? flatbuffers?)
 - RPC via shared memory
+- Run Python (and other tests) during test suite
 
 
 [580]: https://github.com/nuclio/nuclio/issues/580
