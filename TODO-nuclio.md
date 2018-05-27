@@ -16,6 +16,9 @@ nuclio out-of-band todo list
 - Faster RPC (msgpack? flatbuffers?)
 - RPC via shared memory
 - Generate SDKs from common interface definition
+- Nuke alpine
+- Triggers as plugins
+- Runtimes as plugins
 
 
 [580]: https://github.com/nuclio/nuclio/issues/580
