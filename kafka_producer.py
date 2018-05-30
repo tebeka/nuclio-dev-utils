@@ -9,7 +9,6 @@ from random import random
 from subprocess import PIPE, run
 from time import sleep
 
-from pykafka import KafkaClient
 
 id_file = expanduser('~/.nuclio-kafka-id')
 
@@ -32,6 +31,13 @@ def create_topic(name):
     print(' '.join(cmd))
     rv = run(cmd)
     return rv.returncode == 0
+
+
+def connect_kafka():
+    # Import here so we can run other commands in Python
+    from pykafka import KafkaClient
+
+    return KafkaClient(hosts='127.0.0.1:9092')
 
 
 parser = ArgumentParser(description=__doc__)
@@ -96,7 +102,7 @@ if args.create_topic:
 
 log = print if args.verbose else lambda x: 1
 
-client = KafkaClient(hosts='127.0.0.1:9092')
+client = connect_kafka()
 topic = client.topics[args.topic.encode()]
 log(f'topic = {topic}')
 prod = topic.get_producer()
