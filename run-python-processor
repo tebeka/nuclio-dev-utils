@@ -44,7 +44,8 @@ with open(cfg_file, 'w') as out:
     out.write(cfg)
 
 # Assume we're running from nuclio root
-wrapper_script = abspath('./pkg/processor/runtime/python/py/wrapper.py')
+wrapper_script = abspath(
+    './pkg/processor/runtime/python/py/_nuclio_wrapper.py')
 
 env = environ.copy()
 env['NUCLIO_PYTHON_PATH'] = py_path
