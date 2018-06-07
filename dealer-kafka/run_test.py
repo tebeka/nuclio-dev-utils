@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import requests
-from pprint import pprint
 
 stop, start = 3, 1
 
@@ -17,7 +16,7 @@ def post(processor, task, state):
         "port": 0,
         "state": 1,
         "lastEvent": "0001-01-01T00:00:00Z",
-        "jobs": {
+        "triggers": {
             "franz": {
                 "totalTasks": 5,
                 "tasks": [
@@ -45,9 +44,14 @@ def log(msg):
 
 def status():
     for pid in (1, 2):
-        print(pid)
+        print(f'processor {pid} tasks:')
         resp = requests.get(urlof(pid)).json()
-        pprint(resp['jobs']['franz']['tasks'])
+        print_tasks(resp)
+
+
+def print_tasks(resp):
+    for task in resp['triggers']['franz']['tasks']:
+        print(f'\t{task}')
 
 
 log('INITIAL GET')
@@ -57,7 +61,7 @@ input('Hit Enter')
 
 log('STOPPING 1/1')
 resp = post(1, 1, stop)
-pprint(resp['jobs']['franz']['tasks'])
+print_tasks(resp)
 
 log('STATUS')
 status()
@@ -66,7 +70,7 @@ input('Hit Enter')
 
 log('STARTING 2/1')
 resp = post(2, 1, start)
-pprint(resp['jobs']['franz']['tasks'])
+print_tasks(resp)
 
 log('STATUS')
 status()

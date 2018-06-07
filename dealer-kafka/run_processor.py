@@ -46,16 +46,6 @@ plat_cfg_template = '''
 webAdmin:
   enabled: true
   listenAddress: {address}
-logger:
-  sinks:
-    stdout:
-      kind: stdout
-  system:
-  - debug: info
-    sink: stdout
-  functions:
-  - debug: info
-    sink: stdout
 '''
 
 wrapper_script = f'{here}/wrapper.py'
