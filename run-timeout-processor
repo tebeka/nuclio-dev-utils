@@ -12,6 +12,7 @@ here = dirname(abspath(__file__))
 
 
 parser = ArgumentParser(description=__doc__)
+parser.add_argument('--timeout', '-t', help='event timeout', default='1s')
 args = parser.parse_args()
 
 py_file = './test/_functions/python/timeout/timeout.py'
@@ -25,7 +26,7 @@ metadata:
 spec:
   runtime: python
   handler: {module_name}:{handler_name}
-  eventTimeout: 20ms
+  eventTimeout: {args.timeout}
   triggers:
     incrementor_http:
       maxWorkers: 1
