@@ -13,11 +13,14 @@ parser.add_argument(
     '-w', '--max-workers', help='number of workers', default=1, type=int)
 parser.add_argument(
     '--file', '-f', help='handler file', default=None, type=FileType('r'))
+parser.add_argument(
+    '--timeout', '-t', help='event timeout', default='""')
 parser.add_argument('--handler', '-H', help='handler name', default='')
 args = parser.parse_args()
 
 max_workers = args.max_workers
 handler = args.handler or 'nuclio:builtin'
+timeout = args.timeout
 
 handler_dll = '/tmp/handler.go'
 env = environ.copy()
@@ -45,6 +48,7 @@ metadata:
 spec:
   runtime: golang
   handler: {handler}
+  eventTimeout: {timeout}
   triggers:
     http:
       maxWorkers: {max_workers}
