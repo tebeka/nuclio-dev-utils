@@ -1,27 +1,52 @@
 #!/usr/bin/env python
 # Run the golang processor
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, FileType
+from os import environ
 from os.path import abspath, dirname
-from subprocess import call
+from subprocess import run
 
 here = dirname(abspath(__file__))
 
 parser = ArgumentParser(description=__doc__)
 parser.add_argument(
     '-w', '--max-workers', help='number of workers', default=1, type=int)
+parser.add_argument(
+    '--file', '-f', help='handler file', default=None, type=FileType('r'))
+parser.add_argument('--handler', '-H', help='handler name', default='')
 args = parser.parse_args()
 
 max_workers = args.max_workers
+handler = args.handler or 'nuclio:builtin'
+
+handler_dll = '/tmp/handler.go'
+env = environ.copy()
+
+if args.file:
+    cmd = [
+        'go', 'build',
+        '-buildmode=plugin',
+        '-o', handler_dll,
+        args.file.name,
+    ]
+    print(' '.join(cmd))
+    out = run(cmd)
+    if out.returncode != 0:
+        raise SystemExit(out.returncode)
+
+    if not args.handler:
+        handler = 'main:Handler'
+    env['NUCLIO_HANDLER_DLL'] = handler_dll
+
 
 cfg = f'''
 metadata:
   name: golang-builtin
 spec:
   runtime: golang
-  handler: nuclio:builtin
+  handler: {handler}
   triggers:
-    incrementor_http:
+    http:
       maxWorkers: {max_workers}
       kind: http
 '''
@@ -30,5 +55,5 @@ cfg_file = '/tmp/golang-handler.yaml'
 with open(cfg_file, 'w') as out:
     out.write(cfg)
 
-retval = call(['./processor', '-config', cfg_file])
-raise SystemExit(retval)
+out = run(['./processor', '-config', cfg_file], env=env)
+raise SystemExit(out.returncode)
