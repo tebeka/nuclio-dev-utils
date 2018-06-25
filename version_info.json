@@ -1,0 +1,7 @@
+{
+  "label": "latest",
+  "git_commit": "HEAD",
+  "os": "linux",
+  "arch": "amd64",
+  "go_version": "go1.10.3"
+}
