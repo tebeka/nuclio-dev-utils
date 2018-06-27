@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+"""Build Java from source.
+
+Trying to fix https://github.com/nuclio/nuclio/issues/738
+"""
+
+from subprocess import run
+from os import environ
+from base64 import b64encode
+from tempfile import NamedTemporaryFile
+
+
+java_src = b'''
+import io.nuclio.Context;
+import io.nuclio.Event;
+import io.nuclio.EventHandler;
+import io.nuclio.Response;
+
+public class OKHandler implements EventHandler {
+    @Override
+    public Response handleEvent(Context context, Event event) {
+        return new Response().setBody("OK");
+    }
+}
+'''
+
+version_data = '''
+{
+  "label": "latest",
+  "git_commit": "HEAD",
+  "os": "linux",
+  "arch": "amd64",
+  "go_version": "go1.10.3"
+}
+'''
+
+config_data = '''
+metadata:
+  name: java-ok
+spec:
+  runtime: java
+  handler: OKHandler
+  triggers:
+    incrementor_http:
+      maxWorkers: 1
+      kind: http
+'''
+
+
+def tmp_file(data):
+    tmp = NamedTemporaryFile()
+    tmp.write(data.encode('utf-8'))
+    tmp.flush()
+    return tmp
+
+
+src_data = b64encode(java_src).decode('utf-8')
+version_file = tmp_file(version_data)
+config_file = tmp_file(config_data)
+
+env = environ.copy()
+env['NUCLIO_VERSION_FILE'] = version_file.name
+
+cmd = [
+    './nuctl', 'build', '-v', '--no-pull', '--no-cleanup',
+    '--runtime', 'java',
+    '--source', src_data,
+    '-f', config_file.name,
+    'java-src',
+]
+
+
+raise SystemExit(run(cmd, env=env).returncode)
