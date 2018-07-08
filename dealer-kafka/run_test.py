@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 
+"""Run minimal test after "make run-processor" setup"""
+
 import requests
+from argparse import ArgumentParser
 
 stop, start = 3, 1
+verbose = False
 
 
 def post(processor, task, state):
@@ -50,8 +54,18 @@ def status():
 
 
 def print_tasks(resp):
+    if verbose:
+        print(f'RESP:\n{resp}\n---------------\n')
+
     for task in resp['triggers']['franz']['tasks']:
         print(f'\t{task}')
+
+
+parser = ArgumentParser(description=__doc__)
+parser.add_argument('--verbose', '-v', help='be verbose', action='store_true')
+args = parser.parse_args()
+
+verbose = args.verbose
 
 
 log('INITIAL GET')

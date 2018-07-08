@@ -8,6 +8,7 @@ from subprocess import run
 from os import environ
 from base64 import b64encode
 from tempfile import NamedTemporaryFile
+from argparse import ArgumentParser
 
 
 java_src = b'''
@@ -54,6 +55,11 @@ def tmp_file(data):
     return tmp
 
 
+parser = ArgumentParser(description=__doc__)
+parser.add_argument(
+    '-d', '--debug', help='debug', action='store_true', default=False)
+args = parser.parse_args()
+
 src_data = b64encode(java_src).decode('utf-8')
 version_file = tmp_file(version_data)
 config_file = tmp_file(config_data)
@@ -61,8 +67,14 @@ config_file = tmp_file(config_data)
 env = environ.copy()
 env['NUCLIO_VERSION_FILE'] = version_file.name
 
-cmd = [
-    './nuctl', 'build', '-v', '--no-pull', '--no-cleanup',
+if args.debug:
+    cmd = ['dlv', 'debug', './cmd/nuctl', '--']
+else:
+    cmd = ['./nuctl']
+
+
+cmd += [
+    'build', '-v', '--no-pull', '--no-cleanup',
     '--runtime', 'java',
     '--source', src_data,
     '-f', config_file.name,

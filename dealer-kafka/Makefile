@@ -11,7 +11,9 @@ run-processor:
 sync:
 	@rsync \
 	    -e ssh \
-	    -avz . 34.230.69.143:dealer-kafka
+	    -avz . yaron:dealer-kafka
+
+#	    -avz . 34.230.69.143:dealer-kafka
 
 
 .PHONY: list all sync run-processor
